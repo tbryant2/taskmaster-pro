@@ -1,6 +1,5 @@
 var tasks = {};
 
-
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
@@ -20,6 +19,7 @@ var createTask = function(taskText, taskDate, taskList) {
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
+
 
 
 var loadTasks = function() {
@@ -46,6 +46,7 @@ var loadTasks = function() {
 };
 
 
+
 //save tasks 
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -58,6 +59,7 @@ $("#task-form-modal").on("show.bs.modal", function() {
   // clear values
   $("#modalTaskDescription, #modalDueDate").val("");
 });
+
 
 
 // modal is fully visible
@@ -91,6 +93,7 @@ $("#task-form-modal .btn-primary").click(function() {
 });
 
 
+
 //click
 $(".list-group").on("click", "p", function() {
   var text = $(this)
@@ -102,6 +105,7 @@ $(".list-group").on("click", "p", function() {
   $(this).replaceWith(textInput);
   textInput.trigger("focus");
 });
+
 
 
 // blur 
@@ -135,6 +139,7 @@ $(".list-group").on("blur", "textarea", function() {
 });
 
 
+
 // due date was clicked
 $(".list-group").on("click", "span", function() {
   // get current text
@@ -154,6 +159,7 @@ $(".list-group").on("click", "span", function() {
   // automatically focus on new element
   dateInput.trigger("focus");
 });
+
 
 
 //value of due date was changed 
@@ -187,6 +193,8 @@ $(".list-group").on("blur", "input[type='text']", function() {
   $(this).replaceWith(taskSpan);
 });
 
+
+
 // remove all tasks
 $("#remove-tasks").on("click", function() {
   for (var key in tasks) {
@@ -196,7 +204,7 @@ $("#remove-tasks").on("click", function() {
   saveTasks();
 });
 
+
+
 // load tasks for the first time
 loadTasks();
-
-
