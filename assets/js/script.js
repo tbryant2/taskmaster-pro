@@ -1,6 +1,5 @@
 var tasks = {};
 
-// -> 
 var createTask = function(taskText, taskDate, taskList) {
   // create elements that make up a task item
   var taskLi = $("<li>").addClass("list-group-item");
@@ -14,11 +13,13 @@ var createTask = function(taskText, taskDate, taskList) {
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
+  // check due date
+  auditTask(taskLi);
+
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
 
-// -> 
 var loadTasks = function() {
   tasks = JSON.parse(localStorage.getItem("tasks"));
 
@@ -34,7 +35,6 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -42,14 +42,37 @@ var loadTasks = function() {
   });
 };
 
-
-// -> 
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+var auditTask = function(taskEl) {
 
-// -> 
+  // get date from task element
+  var date = $(taskEl)
+    .find("span")
+    .text()
+    .trim();
+
+  console.log(date);
+
+  // convert to moment object at 5:00pm
+  var time = moment(date, "L").set("hour", 17);
+
+  console.log(time);
+
+  // remove any old classes from element
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  // apply new class if task is near/over due date
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  } 
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
+
 // enable draggable/sortable feature on list-group elements
 $(".card .list-group").sortable({
   // enable dragging across lists
@@ -103,8 +126,6 @@ $(".card .list-group").sortable({
   }
 });
 
-
-// -> 
 // trash icon can be dropped onto
 $("#trash").droppable({
   accept: ".card .list-group-item",
@@ -112,7 +133,6 @@ $("#trash").droppable({
   drop: function(event, ui) {
     // remove dragged element from the dom
     ui.draggable.remove();
-
   },
   over: function(event, ui) {
     console.log(ui);
@@ -122,22 +142,24 @@ $("#trash").droppable({
   }
 });
 
+// convert text field into a jquery date picker
+$("#modalDueDate").datepicker({
+  // force user to select a future date
+  minDate: 1
+});
 
-// -> 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
   // clear values
   $("#modalTaskDescription, #modalDueDate").val("");
 });
 
-// -> 
 // modal is fully visible
 $("#task-form-modal").on("shown.bs.modal", function() {
   // highlight textarea
   $("#modalTaskDescription").trigger("focus");
 });
 
-// -> 
 // save button in modal was clicked
 $("#task-form-modal .btn-primary").click(function() {
   // get form values
@@ -160,7 +182,6 @@ $("#task-form-modal .btn-primary").click(function() {
   }
 });
 
-// -> 
 // task text was clicked
 $(".list-group").on("click", "p", function() {
   // get current text of p element
@@ -176,8 +197,6 @@ $(".list-group").on("click", "p", function() {
   textInput.trigger("focus");
 });
 
-
-// -> 
 // editable field was un-focused
 $(".list-group").on("blur", "textarea", function() {
   // get current value of textarea
@@ -205,8 +224,6 @@ $(".list-group").on("blur", "textarea", function() {
   $(this).replaceWith(taskP);
 });
 
-
-// -> 
 // due date was clicked
 $(".list-group").on("click", "span", function() {
   // get current text
@@ -221,12 +238,19 @@ $(".list-group").on("click", "span", function() {
     .val(date);
   $(this).replaceWith(dateInput);
 
+  // enable jquery ui date picker
+  dateInput.datepicker({
+    minDate: 1,
+    onClose: function() {
+      // when calendar is closed, force a "change" event
+      $(this).trigger("change");
+    }
+  });
+
   // automatically bring up the calendar
   dateInput.trigger("focus");
 });
 
-
-// -> 
 // value of due date was changed
 $(".list-group").on("change", "input[type='text']", function() {
   var date = $(this).val();
@@ -249,9 +273,9 @@ $(".list-group").on("change", "input[type='text']", function() {
     .addClass("badge badge-primary badge-pill")
     .text(date);
     $(this).replaceWith(taskSpan);
+    auditTask($(taskSpan).closest(".list-group-item"));
 });
 
-// -> 
 // remove all tasks
 $("#remove-tasks").on("click", function() {
   for (var key in tasks) {
@@ -262,6 +286,5 @@ $("#remove-tasks").on("click", function() {
   saveTasks();
 });
 
-// -> 
 // load tasks for the first time
 loadTasks();
