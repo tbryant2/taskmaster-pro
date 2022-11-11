@@ -1,0 +1,19 @@
+{
+  "name": "taskmaster-pro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tbryant2/taskmaster-pro.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tbryant2/taskmaster-pro/issues"
+  },
+  "homepage": "https://github.com/tbryant2/taskmaster-pro#readme"
+}
